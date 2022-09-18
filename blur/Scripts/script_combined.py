@@ -5,8 +5,8 @@ import math
 
 test_or_train = ['seg_test', 'seg_train']
 cat_or_dog = ['buildings', 'forest', 'glacier', 'mountain', 'sea', 'street']
-directory = '../normal/archive'
-dump = 'blur_combined'
+directory = '../../normal/archive'
+dump = '../data/blur_combined'
 color = (0, 0, 0)
 
 for t in test_or_train:
@@ -15,13 +15,17 @@ for t in test_or_train:
         for fn in os.listdir(directory+'/'+t+'/'+cd):
             image = cv2.imread(os.path.join(directory+'/'+t+'/'+cd, fn))
             if image is not None:
-
                 h, w = image.shape[0:2]
 
-                rh = random.randint(0, h - math.ceil(h/math.sqrt(10)))
-                rw = random.randint(0, w - math.ceil(w/math.sqrt(10)))
-                image_t = image.copy()
-                image_t = cv2.rectangle(image_t, (rw, rh), (rw+math.floor(w/math.sqrt(10)), rh+math.floor(h/math.sqrt(10))), color, -1)
-                cv2.imwrite(os.path.join(dump+'/'+t+'/'+cd, t+cd+"T"+str(num)+'.jpg'), image_t)
+                sizeH = math.ceil(h / math.sqrt(10))
+                sizeW = math.ceil(w / math.sqrt(10))
+
+                rh = random.randint(0, h - sizeH)
+                rw = random.randint(0, w - sizeW)
+
+                blurred_part = cv2.blur(image[rh:rh + sizeH, rw:rw + sizeW], ksize=(15, 15), )
+                blurred = image.copy()
+                blurred[rh:rh + sizeH, rw:rw + sizeW] = blurred_part
+                cv2.imwrite(os.path.join(dump+'/'+t+'/'+cd, t+cd+"T"+str(num)+'.jpg'), blurred)
                 cv2.imwrite(os.path.join(dump+'/'+t+'/'+cd, t+cd+"N"+str(num)+'.jpg'), image)
                 num += 1
